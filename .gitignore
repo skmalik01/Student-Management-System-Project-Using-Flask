@@ -1,0 +1,51 @@
+# 🔹 Python Bytecode Files
+__pycache__/
+*.py[cod]
+*.so
+*.pyo
+
+# 🔹 Virtual Environment
+env/
+venv/
+*.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 🔹 IDE / Editor-Specific Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 🔹 Environment Variables & Secrets
+.env
+*.env
+config.py  # ⚠️ If config contains sensitive data, ignore it
+
+# 🔹 Database & Migrations
+instance/
+migrations/
+*.sqlite3
+*.db
+dump.rdb
+
+# 🔹 Logs & Debugging Files
+logs/
+*.log
+nohup.out
+error.log
+
+# 🔹 Compiled Assets
+*.tar.gz
+*.zip
+
+# 🔹 Jupyter Notebook & Other Cache Files
+.ipynb_checkpoints/
+*.pyc
+
+# 🔹 OS-Specific Files
+.DS_Store
+Thumbs.db
+
+# 🔹 Postman Collections & Testing Files
+postman_collection.json
