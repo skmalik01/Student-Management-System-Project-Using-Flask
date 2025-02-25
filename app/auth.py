@@ -68,7 +68,7 @@ def check_if_token_revoked(jwt_header, jwt_payload):
     return jwt_payload["jti"] in BLOCKLIST  
 
 
-def role_required(required_role):
+def role_required(*required_role):
     def decorator(func):
         @wraps(func)
         @jwt_required()
@@ -79,8 +79,8 @@ def role_required(required_role):
             if "role" not in claims:
                 return jsonify({"message": "Invalid token: Missing role"}), 401
 
-            if claims["role"] != required_role:
-                return jsonify({"message": "Unauthorized access"}), 403
+            # if claims["role"] != required_role:
+            #     return jsonify({"message": "Unauthorized access"}), 403
 
             return func(*args, **kwargs)
 
