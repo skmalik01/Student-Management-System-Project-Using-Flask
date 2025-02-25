@@ -205,17 +205,45 @@ def delete_course(course_id):
 @main.route('/enroll', methods=['POST'])
 @role_required('admin')
 def enroll_student():
+    try:
+        claims = get_jwt()
+        current_user = get_jwt_identity()
+
+        if "role" not in claims or claims["role"] not in ["admin", "staff"]:
+            return jsonify({"message": "Only admins and staff can enroll students"}), 403
+
+    except Exception as e:
+        return jsonify({"error": f"Authentication error: {str(e)}"}), 401
+
     data = request.get_json()
-    
+
     required_fields = ["student_id", "course_id"]
-    empty_fields = [field for field in required_fields if field not in data or not data[field].strip()]
+    empty_fields = [field for field in required_fields if field not in data or (isinstance(data[field], str) and not data[field].strip())]
+
     if empty_fields:
         return jsonify({"message": f"These fields cannot be empty: {', '.join(empty_fields)}"}), 400
-        
-    new_enrollment = Enrollment(
-        student_id=data['student_id'],
-        course_id=data['course_id']
-    )
+
+    try:
+        student_id = int(data["student_id"])
+        course_id = int(data["course_id"])
+    except ValueError:
+        return jsonify({"message": "Student ID and Course ID must be integers"}), 400
+
+    student = Student.query.get(student_id)
+    if not student:
+        return jsonify({"message": f"Student with ID {student_id} not found"}), 404
+
+    course = Course.query.get(course_id)
+    if not course:
+        return jsonify({"message": f"Course with ID {course_id} not found"}), 404
+
+    existing_enrollment = Enrollment.query.filter_by(student_id=student_id, course_id=course_id).first()
+    if existing_enrollment:
+        return jsonify({"message": "Student is already enrolled in this course"}), 409
+
+    new_enrollment = Enrollment(student_id=student_id, course_id=course_id)
     db.session.add(new_enrollment)
     db.session.commit()
-    return jsonify(EnrollmentSchema().dump(new_enrollment)), 201
+
+    return jsonify({"message": "Student successfully enrolled!", "enrollment": EnrollmentSchema().dump(new_enrollment)}), 201
+
