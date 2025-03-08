@@ -21,8 +21,11 @@ def register():
 
     if User.query.filter_by(username=data['username']).first():
         return jsonify({"message": "User already exists"}), 400
+    
+    if "role" in data and data["role"] in ["admin"]:
+        return jsonify({"message": "You cannot assign yourself as admin or staff!"}), 403
 
-    if data['role'] not in ['admin', 'staff', 'student']:
+    if data['role'] not in ['staff', 'student']:
         return jsonify({"message": "Invalid role"}), 400
 
     new_user = User(username=data['username'], role=data['role'])
