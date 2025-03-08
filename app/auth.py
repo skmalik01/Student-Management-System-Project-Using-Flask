@@ -53,7 +53,7 @@ def login():
     return response
 
 
-@auth.route('/logout', methods=['POST'])
+@auth.route('/logout', methods=['GET'])
 @jwt_required()
 def logout():
     response = make_response(jsonify({"message": "Successfully logged out"}))
@@ -76,7 +76,7 @@ def role_required(*required_role):
             claims = get_jwt()  
             user_id = get_jwt_identity()  
             
-            if "role" not in claims:
+            if "role" not in claims: 
                 return jsonify({"message": "Invalid token: Missing role"}), 401
 
             # if claims["role"] != required_role:
@@ -109,6 +109,54 @@ def staff_route():
     current_user_id = get_jwt_identity()
     claims = get_jwt()
     return jsonify({"message": "Welcome, Staff!", "user_id": current_user_id, "role": claims["role"]}), 200
+
+@auth.route("/delete-user/<int:user_id>", methods=["DELETE"])
+@role_required("admin", "staff")  
+def delete_user_by_id(user_id):
+    try:
+        current_user_id = get_jwt_identity()  
+        claims = get_jwt()
+        current_role = claims.get("role")
+
+        
+        user_to_delete = User.query.get(user_id)
+
+        if not user_to_delete:
+            return jsonify({"message": "User not found!"}), 404
+
+        
+        if current_role == "admin" and user_to_delete.role == "admin":
+            return jsonify({"message": "Admins cannot delete other admins!"}), 403
+
+        
+        if current_role == "staff" and user_to_delete.role in ["admin", "staff"]:
+            return jsonify({"message": "Staff cannot delete Admins or other Staff members!"}), 403
+
+        
+        if current_user_id == user_id:
+            return jsonify({"message": "You cannot delete yourself!"}), 403
+
+        deleted_user_info = {
+            "deleted_user_id": user_to_delete.id,
+            "deleted_user_role": user_to_delete.role
+        }
+
+        db.session.delete(user_to_delete)
+        db.session.commit()
+
+        return jsonify({
+            "message": f"User with ID {user_id} ({deleted_user_info['deleted_user_role']}) deleted successfully!",
+            "deleted_user": deleted_user_info,
+            "deleted_by": {
+                "user_id": current_user_id,
+                "role": current_role
+            }
+        }), 200
+
+    except Exception as e:
+        db.session.rollback() 
+        return jsonify({"error": str(e)}), 500
+
 
 
 @auth.route('/student-only', methods=['GET'])

@@ -1,20 +1,20 @@
 from marshmallow import Schema, fields
 
 class StudentSchema(Schema):
-    id = fields.Int()
-    first_name = fields.Str()
-    last_name = fields.Str()
-    email = fields.Str()
+    id = fields.Int(dump_only=True)
+    first_name = fields.Str(required=True)
+    last_name = fields.Str(required=True)
+    email = fields.Email(unique=True)
 
 class CourseSchema(Schema):
-    id = fields.Int()
-    name = fields.Str()
-    description = fields.Str()
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    description = fields.Str(required=True)
 
 class EnrollmentSchema(Schema):
-    id = fields.Int()
-    student_id = fields.Int()
-    course_id = fields.Int()
+    id = fields.Int(dump_only=True)
+    student_id = fields.Int(required=True)
+    course_id = fields.Int(required=True)
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
