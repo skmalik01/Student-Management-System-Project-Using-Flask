@@ -23,8 +23,13 @@ def add_student():
     data = request.get_json()
     required_fields = ["first_name", "last_name", "email"]
     empty_fields = [field for field in required_fields if field not in data or not data[field].strip()]
+    
     if empty_fields:
         return jsonify({"message": f"These fields cannot be empty: {', '.join(empty_fields)}"}), 400
+    
+    existing_student = Student.query.filter_by(email=data["email"]).first()
+    if existing_student:
+        return jsonify({"message": "Email already exists. Please use a different email."}), 400
         
     new_student = Student(
         first_name=data['first_name'],
