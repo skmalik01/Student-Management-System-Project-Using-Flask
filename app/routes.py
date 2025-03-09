@@ -15,7 +15,7 @@ def add_student():
         current_user_id = get_jwt_identity()  
         
         if claims["role"] not in ["admin", "staff"]:
-            return jsonify({"message": "Only admin and staff can update students"}), 403
+            return jsonify({"message": "Only admin and staff can add students"}), 403
         
     except Exception as e:
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401
@@ -101,7 +101,7 @@ def get_students():
         current_user_id = get_jwt_identity()  
         
         if claims["role"] not in ["admin", "staff"]:
-            return jsonify({"message": "Only admin and staff can update students"}), 403
+            return jsonify({"message": "Only admin and staff can read students"}), 403
         
     except Exception as e:
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401
@@ -121,7 +121,7 @@ def get_student(id):
         current_user_id = get_jwt_identity()  
         
         if claims["role"] not in ["admin", "staff"]:
-            return jsonify({"message": "Only admin and staff can update students"}), 403
+            return jsonify({"message": "Only admin and staff can read students"}), 403
         
     except Exception as e:
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401
@@ -137,7 +137,7 @@ def add_course():
         current_user_id = get_jwt_identity()  
         
         if claims["role"] not in ["admin", "staff"]:
-            return jsonify({"message": "Only admin can update Course"}), 403
+            return jsonify({"message": "Only admin can Add Course"}), 403
         
     except Exception as e:
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401
@@ -197,7 +197,7 @@ def delete_course(course_id):
         current_user_id = get_jwt_identity()  
         
         if claims["role"] not in ["admin", "staff"]:
-            return jsonify({"message": "Only admin can update course"}), 403
+            return jsonify({"message": "Only admin can delete course"}), 403
         
     except Exception as e:
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401

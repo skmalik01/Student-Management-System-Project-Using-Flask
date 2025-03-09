@@ -23,7 +23,7 @@ def register():
         return jsonify({"message": "User already exists"}), 400
     
     if "role" in data and data["role"] in ["admin"]:
-        return jsonify({"message": "You cannot assign yourself as admin or staff!"}), 403
+        return jsonify({"message": "You cannot assign yourself as admin!"}), 403
 
     if data['role'] not in ['staff', 'student']:
         return jsonify({"message": "Invalid role"}), 400
