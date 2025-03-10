@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from app import schemas
 from app.models import db, Student, Course, Enrollment
 from app.schemas import StudentSchema, CourseSchema, EnrollmentSchema
 from app.auth import  role_required
@@ -22,10 +21,11 @@ def add_student():
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401
     
     data = request.get_json()
-    schemas = StudentSchema()
-    errors = schemas.validate(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
+    required_fields = ["first_name", "last_name", "email"]
+    empty_fields = [field for field in required_fields if field not in data or not data[field].strip()]
+    
+    if empty_fields:
+        return jsonify({"message": f"These fields cannot be empty: {', '.join(empty_fields)}"}), 400
     
     existing_student = Student.query.filter_by(email=data["email"]).first()
     if existing_student:
@@ -143,10 +143,11 @@ def add_course():
         return jsonify({"error": f"Authentication error: {str(e)}"}), 401
     
     data = request.get_json()
-    schemas = CourseSchema()
-    errors = schemas.validate(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
+    
+    required_fields = ["name", "description"]
+    empty_fields = [field for field in required_fields if field not in data or not data[field].strip()]
+    if empty_fields:
+        return jsonify({"message": f"These fields cannot be empty: {', '.join(empty_fields)}"}), 400
         
     new_course = Course(
         name=data['name'],
@@ -221,10 +222,11 @@ def enroll_student():
 
     data = request.get_json()
 
-    schemas = EnrollmentSchema()
-    errors = schemas.validate(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
+    required_fields = ["student_id", "course_id"]
+    empty_fields = [field for field in required_fields if field not in data or (isinstance(data[field], str) and not data[field].strip())]
+
+    if empty_fields:
+        return jsonify({"message": f"These fields cannot be empty: {', '.join(empty_fields)}"}), 400
 
     try:
         student_id = int(data["student_id"])

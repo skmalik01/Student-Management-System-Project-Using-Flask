@@ -99,7 +99,7 @@ def protected():
 
 
 @auth.route('/admin-only', methods=['GET'])
-@role_required("admin")
+@role_required("admin")   
 def admin_route():
     current_user_id = get_jwt_identity()
     claims = get_jwt()
